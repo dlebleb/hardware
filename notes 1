@@ -1,0 +1,305 @@
+source /opt/ros/humble/setup.bash
+source ~/ros_ws/luci_ros2/install/setup.bash
+
+source ROS  = ROS2 Humble’ı tanıtmak
+source workspace = LUCI paketlerini tanıtmak
+
+Connect to LUCI
+ros2 run luci_grpc_interface grpc_interface_node -a 10.2.10.3
+
+
+#Trying the remote joystick to figure out FB and LR:
+ros2 service call /luci/set_auto_remote_input std_srvs/srv/Empty
+ros2 service call /luci/remove_auto_remote_input std_srvs/srv/Empty
+ros2 topic type /luci/remote_joystick
+ros2 interface show luci_messages/msg/LuciJoystick
+
+terminal B:
+ros2 topic echo /luci/remote_joystick
+
+terminal C:
+ros2 topic echo /luci/odom --field twist.twist
+
+terminal D:
+#FORWARD MOTION STARTS AT FB = +5
+ros2 topic pub -r 20 /luci/remote_joystick luci_messages/msg/LuciJoystick \
+"{forward_back: 15, left_right: 0, joystick_zone: 0, input_source: 1}"
+
+#RIGHT TURN STARTS AT LR = +10
+ros2 topic pub -r 20 /luci/remote_joystick luci_messages/msg/LuciJoystick \
+"{forward_back: 0, left_right: 10, joystick_zone: 4, input_source: 1}"
+
+#LEFT TURN STARTS AT LR = -10
+ros2 topic pub -r 20 /luci/remote_joystick luci_messages/msg/LuciJoystick \
+"{forward_back: 0, left_right: -10, joystick_zone: 3, input_source: 1}"
+
+#BACK MOTION STARTS AT FB = -10
+ros2 topic pub -r 20 /luci/remote_joystick luci_messages/msg/LuciJoystick \
+"{forward_back: -30, left_right: 0, joystick_zone: 7, input_source: 1}"
+
+ros2 topic pub --once /luci/remote_joystick luci_messages/msg/LuciJoystick \
+"{forward_back: 0, left_right: 0, joystick_zone: 8, input_source: 1}"
+ 
+#FRONTLEFT
+ros2 topic pub -r 20 /luci/remote_joystick luci_messages/msg/LuciJoystick \
+"{forward_back: 30, left_right: -20, joystick_zone: 1, input_source: 1}"
+
+#BACKRIGHT:
+ros2 topic pub -r 20 /luci/remote_joystick luci_messages/msg/LuciJoystick \
+"{forward_back: -50, left_right: 20, joystick_zone: 6, input_source: 1}"
+
+
+#NOTLAR ABOUT imu_odom_position_controller.py
+chmod +x imu_odom_position_controller.py yapinca artik bunu su sekilde run edebilirim:
+./imu_odom_position_controller.py
+
+ros2 node list 
+ros2 topic list
+
+
+MOTIVE IP ADRESS:ipconfig
+192.168.0.12
+
+LINUX IP ADRESS:hostname -I
+192.168.0.235 
+
+192.168.0.x ILK 3 BLOK AYNI OLMALI, DEMEK KI AYNI AGDALAR.
+ping 192.168.0.12
+
+Terminal 1:
+source /opt/ros/humble/setup.bash
+source ~/ros_ws/luci_ros2/install/setup.bash
+ros2 launch mocap4r2_optitrack_driver optitrack2.launch.py
+
+Terminal 2:
+source /opt/ros/humble/setup.bash
+source ~/ros_ws/luci_ros2/install/setup.bash
+ros2 lifecycle set /mocap4r2_optitrack_driver_node activate
+Transitioning successful
+
+Teyit etmek amacli:
+damla@Damlis:~$ ros2 lifecycle get /mocap4r2_optitrack_driver_node
+active [3]
+
+ros2 topic list
+ros2 topic echo /rigid_bodies
+ros2 topic echo /rigid_bodies --once
+
+MOTIVE GROUND PLANE:
++x kisa kenar (saga bakiyor, isec)
++z uzun kenar (asagiya bakiyor, columbus ave)
++y up
+
+HER ZAMAN RIGID BODY'YI +X E BAKARKEN OLUSTUR KI YAW 0 OLSUN.
+
+su sekilde run ediyoruz:
+cd ~/ros_ws/luci_ros2/src/controller_test
+python3 mocap_waypoint_controller.py
+
+Waypoints:      
+Goal
+      x: 1.9043370485305786
+      y: 0.028943423181772232
+      z: -4.009087562561035
+
+Start
+      x: -1.7676024436950684
+      y: 0.04562768340110779
+      z: 1.027747392654419
+
+W1
+      x: 1.0287094116210938
+      y: 0.014331177808344364
+      z: 0.501008152961731
+
+W2
+      x: 2.0002083778381348
+      y: 0.02026246301829815
+      z: -1.9541651010513306
+
+W3
+      x: 0.11567721515893936
+      y: 0.041109997779130936
+      z: -3.6096115112304688
+
+W4
+      x: -1.8891046047210693
+      y: 0.048654086887836456
+      z: -3.9263010025024414
+
+W5
+      x: 0.07018498331308365
+      y: 0.08021333813667297
+      z: -1.0817737579345703
+
+width ve height: 30 cm. 
+Extended rectangles icin 45cm.
+
+obstacle 1 (kup)
+      x: -2.2611746788024902
+      y: 0.042184118181467056
+      z: -0.023710258305072784
+
+obstacle 2 (rectangle)
+    position:
+      x: 1.0843770503997803
+      y: 0.020559271797537804
+      z: -0.4697885513305664
+
+obstacle 3 (rectangle)
+      x: 0.8024447560310364
+      y: 0.02796633169054985
+      z: -2.652466297149658
+
+obstacle 4 (rectangle)
+      x: -2.205349922180176
+      y: 0.04111186042428017
+      z: -2.6097302436828613
+
+obstacle 5 (kup)
+      x: -3.065387725830078
+      y: 0.07264231890439987
+      z: 0.16202247142791748
+
+
+Coordinates again:
+WAYPOINTS:
+w5
+      x: 0.06294851005077362
+      y: 0.012391033582389355
+      z: -1.180220127105713
+
+
+w3
+      x: 0.14618495106697083
+      y: -0.015254923142492771
+      z: -3.672722578048706
+
+w4
+      x: -1.8516931533813477
+      y: -0.0427132174372673
+      z: -4.0430908203125
+
+w2
+      x: 1.9849759340286255
+      y: 0.016491757705807686
+      z: -1.9953231811523438
+
+w1
+      x: 1.1044059991836548
+      y: 0.033720191568136215
+      z: 0.4682784974575043
+
+obstacle'lar en sol koseye gore olculuyor.
+obstacle 1 (kup)    
+      x: -0.8924213647842407
+      y: 0.011844213120639324
+      z: -0.29427799582481384
+
+
+obstacle 2 (rectangle) en: 30cm, boy: 60cm    
+      position:
+      x: 1.1765800714492798
+      y: 0.026454908773303032
+      z: -0.5102545619010925
+
+
+obstacle 3 (rectangle) en: 60cm, boy:30cm    
+      position:
+      x: 0.9342218637466431
+      y: -0.002572430530562997
+      z: -2.714024305343628
+
+
+obstacle 4 (rectangle) en: 60cm, boy:30cm
+    position:
+      x: -2.0749974250793457
+      y: -0.03575320169329643
+      z: -2.723616361618042
+
+start:
+    position:
+      x: -1.6997642517089844
+      y: 0.029085036367177963
+      z: 0.9527114033699036
+
+goal:
+    position:
+      x: 2.057727813720703
+      y: -0.0033950316719710827
+      z: -4.020308017730713
+
+q_start = np.array([-0.953, 1.7])
+q_goal_final = np.array([4.02, -2.058])
+
+waypoints = np.array([
+    [-0.468, -1.104],   # w1 bunu y'de 0'a koysam. [-0.5, 0]
+    [1.995,  -1.985],   # w2
+    [3.673,  -0.146],   # w3
+    [4.043,   1.852],   # w4
+    [1.18,   -0.063],   # w5  [1.5,   2.5]
+])
+
+rect_obstacles = [
+    [0.294,  0.892, 0.3, 0.3],   # obs1 kup
+    [0.51,  -1.177, 0.6, 0.3],   # obs2 x'te uzun
+    [2.714, -0.934, 0.3, 0.6],   # obs3 y'de uzun
+    [2.724,  2.075, 0.3, 0.6],   # obs4 y'de uzun
+]
+
+[0.294,  0.592, 0.3, 0.3],   # obs1: y = 0.892 - 0.3 = 0.592
+[0.51,  -1.477, 0.6, 0.3],   # obs2: y = -1.177 - 0.3 = -1.477
+[2.714, -1.534, 0.3, 0.6],   # obs3: y = -0.934 - 0.6 = -1.534
+[2.724,  1.475, 0.3, 0.6],   # obs4: y = 2.075 - 0.6 = 1.475
+
+cd ~/Github/path_planning/tsp_pf_rrt+astar_combined
+python3 -c "import numpy as np; print(np.load('tsp_path.npy'))"
+
+tekerlekli sandalye ile etrafini dolastim kafesin ve bizim sandalye ile limitlerimiz bunlar:
+y deki limitim: -2.1, +3.2 m
+x deki limitim: +4.4, -1 m 
+
+[0.294,  0.8, 0.3, 0.3]
+[2.724,  1.85, 0.3, 0.6]
+
+
+3 tane versiyon var (all with buffer 0.75 cm):
+1)
+q_start = np.array([-0.953, 1.7])
+q_goal_final = np.array([4.02, -2.058])
+
+
+    rect_obstacles = [
+    [0.294,  0.8, 0.3, 0.3],   # obs1: y = 0.892 - 0.3 = 0.592
+    [0.51,  -1.477, 0.6, 0.3],   # obs2: y = -1.177 - 0.3 = -1.477
+    [2.714, -1.534, 0.3, 0.6],   # obs3: y = -0.934 - 0.6 = -1.534
+    [2.724,  1.85, 0.3, 0.6],   # obs4: y = 2.075 - 0.6 = 1.475
+]
+
+
+    waypoints = np.array([
+    [-0.5, 0],   # w1
+    [1.995,  -1.985],   # w2
+    [3.673,  -0.146],   # w3
+    [4.043,   1.852],   # w4
+    [1.5,   2.50],   # w5
+])
+
+2) Aynisi with Goal: q_goal_final = np.array([0, -1])
+    waypoints = np.array([
+    [-0.5, 0],   # w1
+    #[1.995,  -1.985],   # w2
+    [3.673,  -0.146],   # w3
+    [4.043,   1.852],   # w4
+    [1.5,   2.50],   # w5
+])
+
+
+3) q_goal_final = np.array([0, -1])
+ rect_obstacles = [
+    [0.294,  0.8, 0.3, 0.3],   # obs1: y = 0.892 - 0.3 = 0.592
+    #[0.51,  -1.477, 0.6, 0.3],   # obs2: y = -1.177 - 0.3 = -1.477
+    [2.714, -1.534, 0.3, 0.6],   # obs3: y = -0.934 - 0.6 = -1.534
+    [2.724,  1.85, 0.3, 0.6],   # obs4: y = 2.075 - 0.6 = 1.475
+]
+

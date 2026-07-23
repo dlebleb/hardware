@@ -13,8 +13,16 @@ from APF_RRT_Astar import extract_polyline, init_environment
 # q_start = np.array([-40.0, -40.0])
 # q_goal_final = np.array([20, 10])
 
-q_start = np.array([-1.0, 1.7])
-q_goal_final = np.array([4.0, -1.9])
+# q_start = np.array([-1.0, 1.7])
+# q_goal_final = np.array([4.0, -1.9])
+
+#DRONE CAGE
+# q_start = np.array([-0.953, 1.7])
+# q_goal_final = np.array([4.02, -2.058])
+
+#OUTSIDE DRONE CAGE
+q_start = np.array([-2, 2])
+q_goal_final = np.array([-2, -2])
 
 rect_obstacles, expanded_rects, eps_expanded_rects, waypoints = init_environment()
 
@@ -194,8 +202,14 @@ print("TSP path saved!")
 
 fig, ax = plt.subplots(figsize=(6,6))
 
-ax.set_xlim(-2,5)
-ax.set_ylim(-3,5)
+#DRONE CAGE
+# ax.set_xlim(-1,4.4)
+# ax.set_ylim(-2.1, 3.2)
+
+#OUTSIDE DRONE CAGE
+ax.set_xlim(-2.7, 5.1)
+ax.set_ylim(-3.35, 3.35)
+
 ax.set_title("TSP")
 ax.set_xlabel("X (m)")
 ax.set_ylabel("Y (m)")
